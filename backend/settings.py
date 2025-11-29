@@ -11,16 +11,16 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 
 SECRET_KEY = os.environ.get(
     "DJANGO_SECRET_KEY",
+    "dev-secret-ne-hagyd-igy-productionben"
 )
 
 DEBUG = os.environ.get("DJANGO_DEBUG", "True") == "True"
 
-# *** CSAK EZ AZ EGY LEGYEN ***
-ALLOWED_HOSTS = [
-    "localhost",
-    "127.0.0.1",
-    "vag-projekt.onrender.com",  # Render backend URL
-]
+ALLOWED_HOSTS = os.environ.get(
+    "DJANGO_ALLOWED_HOSTS",
+    "localhost,127.0.0.1"
+).split(",")
+
 
 
 # ======================================================================
@@ -164,16 +164,17 @@ MIDDLEWARE = [
 
 CORS_ALLOWED_ORIGINS = [
     "http://localhost:5173",
-    "https://frontend-igcv.onrender.com",  # Render frontend URL – pontosan így, perjel nélkül
+    "https://frontend-igcv.onrender.com",  # a Vite/Render frontend URL-je
 ]
 
 CSRF_TRUSTED_ORIGINS = [
     "http://localhost:5173",
-    "https://vag-projekt.onrender.com",
-    "https://frontend-igcv.onrender.com",
+    "https://vag-projekt.onrender.com",     # backend URL
+    "https://frontend-igcv.onrender.com",   # frontend URL
 ]
 
 CORS_ALLOW_CREDENTIALS = True
+
 
 # ======================================================================
 # Django REST Framework
