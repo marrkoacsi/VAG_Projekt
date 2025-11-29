@@ -1,5 +1,19 @@
+// API_BASE: csak domain, /api NÉLKÜL
 const API_BASE =
   import.meta.env.VITE_API_BASE_URL || "http://127.0.0.1:8000";
+
+async function handleResponse(res) {
+  if (!res.ok) {
+    let data = {};
+    try {
+      data = await res.json();
+    } catch (e) {
+      // ha nem JSON a válasz, hagyjuk üresen
+    }
+    throw { status: res.status, data };
+  }
+  return res.json();
+}
 
 // REGISZTRÁCIÓ
 export async function register(payload) {
@@ -8,30 +22,12 @@ export async function register(payload) {
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify(payload),
   });
-
-  if (!res.ok) {
-    const errorData = await res.json().catch(() => ({}));
-    throw { status: res.status, data: errorData };
-  }
-
-  return res.json();
+  return handleResponse(res);
 }
 
-async function handleResponse(res) {
-  let data = {};
-  try {
-    data = await res.json();
-  } catch (e) {
-    // nincs JSON
-  }
-  if (!res.ok) {
-    throw data || { detail: "Ismeretlen hiba" };
-  }
-  return data;
-}
-
-export async function register(payload) {
-  const res = await fetch(`${API_BASE}/api/auth/register/`, {
+// BELÉPÉS
+export async function login(payload) {
+  const res = await fetch(`${API_BASE}/api/auth/login/`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify(payload),
@@ -39,20 +35,12 @@ export async function register(payload) {
   return handleResponse(res);
 }
 
-export async function verifyEmail(email, code) {
+// EMAIL HITELESÍTÉS
+export async function verifyEmail(code) {
   const res = await fetch(`${API_BASE}/api/auth/verify-email/`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ email, code }),
-  });
-  return handleResponse(res);
-}
-
-export async function login(username, password) {
-  const res = await fetch(`${API_BASE}/api/auth/login/`, {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ username, password }),
+    body: JSON.stringify({ code }),
   });
   return handleResponse(res);
 }
