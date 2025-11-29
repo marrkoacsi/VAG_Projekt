@@ -2,7 +2,7 @@ from pathlib import Path
 import os
 
 # ======================================================================
-# Alap beállítások
+# Alap dolgok
 # ======================================================================
 
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -25,7 +25,7 @@ ALLOWED_HOSTS = os.environ.get(
 # ======================================================================
 
 INSTALLED_APPS = [
-    # alap Django appok
+    # Django alap appok
     "django.contrib.admin",
     "django.contrib.auth",
     "django.contrib.contenttypes",
@@ -48,7 +48,7 @@ INSTALLED_APPS = [
 # ======================================================================
 
 MIDDLEWARE = [
-    "corsheaders.middleware.CorsMiddleware",  # CORS mindig legelöl
+    "corsheaders.middleware.CorsMiddleware",  # CORS legyen legelöl
     "django.middleware.security.SecurityMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
     "django.middleware.common.CommonMiddleware",
@@ -141,7 +141,7 @@ DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
 CORS_ALLOWED_ORIGINS = [
     "http://localhost:5173",
-    "https://frontend-igcv.onrender.com",  # Vite/Render frontend URL
+    "https://frontend-igcv.onrender.com",   # Vite/Render frontend URL
 ]
 
 CSRF_TRUSTED_ORIGINS = [
@@ -173,9 +173,9 @@ REST_FRAMEWORK = {
 
 EMAIL_BACKEND = "django.core.mail.backends.smtp.EmailBackend"
 
-EMAIL_HOST = os.environ.get("EMAIL_HOST", "smtp.gmail.com")
-EMAIL_PORT = int(os.environ.get("EMAIL_PORT", "587"))
-EMAIL_USE_TLS = os.environ.get("EMAIL_USE_TLS", "True") == "True"
+EMAIL_HOST = "smtp.gmail.com"
+EMAIL_PORT = 587
+EMAIL_USE_TLS = True
 
 EMAIL_HOST_USER = os.environ.get("EMAIL_HOST_USER", "vagteszt@gmail.com")
 EMAIL_HOST_PASSWORD = os.environ.get("EMAIL_HOST_PASSWORD", "")
