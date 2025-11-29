@@ -1,88 +1,112 @@
-
-from rest_framework.permissions import AllowAny
+# accounts/views.py
 from django.contrib.auth import authenticate
+from django.contrib.auth.models import User
+from django.core.mail import send_mail
+from django.utils.crypto import get_random_string
+
+from rest_framework.views import APIView
+from rest_framework.response import Response
+from rest_framework import status, permissions
 from rest_framework.authtoken.models import Token
 
 from .serializers import RegisterSerializer, LoginSerializer, EmailVerifySerializer
 from .models import EmailVerification
 
-from rest_framework.views import APIView
-from rest_framework.response import Response
-from rest_framework import status, permissions
 
 class RegisterView(APIView):
     permission_classes = [permissions.AllowAny]
 
     def post(self, request):
-        # JSON, form-data, bármi -> request.data
+        # *** FONTOS: JSON-hoz mindig request.data !!! ***
         serializer = RegisterSerializer(data=request.data)
 
-        if serializer.is_valid():
-            user = serializer.save()
-            # itt mehet a hitelesítő kód generálás + email küldés
-            return Response(
-                {"message": "Regisztráció sikeres, ellenőrizd az emailedet a kód miatt."},
-                status=status.HTTP_201_CREATED,
-            )
+        if not serializer.is_valid():
+            # Itt fogod látni, ha valami mező hiányzik / rossz
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
-        # ha valami nem oké, hibaüzeneteket ad vissza (pl. foglalt felhasználónév)
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        # Létrehozzuk a usert (inaktív lesz, amíg nem erősíti meg az emailt)
+        user = serializer.save()
+        user.is_active = False
+        user.save()
+
+        # 6 jegyű kód
+        code = get_random_string(length=6, allowed_chars="0123456789")
+
+        # EmailVerification objektum (feltételezve, hogy ilyen a modelled)
+        EmailVerification.objects.create(user=user, code=code, is_verified=False)
+
+        # Email kiküldése (Renderen Gmail app-passworddal)
+        send_mail(
+            subject="VAG Fórum – regisztráció megerősítése",
+            message=f"A regisztrációs kódod: {code}",
+            from_email=None,  # DEFAULT_FROM_EMAIL-ből jön
+            recipient_list=[user.email],
+            fail_silently=True,
+        )
+
+        return Response(
+            {"message": "Regisztráció sikeres, ellenőrizd az emailedet a kód miatt."},
+            status=status.HTTP_201_CREATED,
+        )
 
 
 class LoginView(APIView):
-    permission_classes = [AllowAny]
+    permission_classes = [permissions.AllowAny]
 
     def post(self, request):
-        # itt is request.data legyen
         serializer = LoginSerializer(data=request.data)
         if not serializer.is_valid():
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
-        username = serializer.validated_data["username"]
-        password = serializer.validated_data["password"]
+        user = authenticate(
+            username=serializer.validated_data["username"],
+            password=serializer.validated_data["password"],
+        )
 
-        user = authenticate(username=username, password=password)
         if user is None:
             return Response(
                 {"detail": "Hibás felhasználónév vagy jelszó."},
                 status=status.HTTP_400_BAD_REQUEST,
             )
 
+        if not user.is_active:
+            return Response(
+                {"detail": "Kérlek erősítsd meg az emailedet a belépés előtt."},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+
         token, _ = Token.objects.get_or_create(user=user)
-        return Response(
-            {
-                "message": "Sikeres bejelentkezés",
-                "token": token.key,
-                "username": user.username,
-                "email": user.email,
-            }
-        )
+        return Response({"token": token.key})
 
 
 class VerifyEmailView(APIView):
-    permission_classes = [AllowAny]
+    permission_classes = [permissions.AllowAny]
 
     def post(self, request):
-        # ha itt is POST-ot használsz, akkor itt is request.data
         serializer = EmailVerifySerializer(data=request.data)
         if not serializer.is_valid():
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
+        email = serializer.validated_data["email"]
         code = serializer.validated_data["code"]
 
         try:
-            verification = EmailVerification.objects.get(token=code, is_used=False)
-        except EmailVerification.DoesNotExist:
-            return Response(
-                {"detail": "Érvénytelen vagy már felhasznált kód."},
-                status=status.HTTP_400_BAD_REQUEST,
+            user = User.objects.get(email=email)
+        except User.DoesNotExist:
+            return Response({"detail": "Nincs ilyen email cím."}, status=400)
+
+        try:
+            ev = EmailVerification.objects.get(
+                user=user,
+                code=code,
+                is_verified=False,
             )
+        except EmailVerification.DoesNotExist:
+            return Response({"detail": "Hibás vagy már felhasznált kód."}, status=400)
 
-        verification.is_used = True
-        verification.save()
-
-        user = verification.user
         user.is_active = True
         user.save()
+        ev.is_verified = True
+        ev.save()
 
         return Response({"message": "Email sikeresen megerősítve."})
