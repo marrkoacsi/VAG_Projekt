@@ -1,8 +1,7 @@
 # accounts/views.py
-import logging
+
 from django.contrib.auth import authenticate
 from django.contrib.auth.models import User
-from django.core.mail import send_mail
 from django.utils.crypto import get_random_string
 
 from rest_framework.views import APIView
@@ -13,46 +12,56 @@ from rest_framework.authtoken.models import Token
 from .serializers import RegisterSerializer, LoginSerializer, EmailVerifySerializer
 from .models import EmailVerification
 
-logger = logging.getLogger(__name__)
+import os
+import resend
+from django.conf import settings
 
 
 class RegisterView(APIView):
     permission_classes = [permissions.AllowAny]
 
     def post(self, request):
-        # JSON-nál mindig request.data
         serializer = RegisterSerializer(data=request.data)
 
         if not serializer.is_valid():
-            # pl. üres mező, rövid jelszó, foglalt username/email stb.
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
-        # user létrehozása (kezdetben inaktív)
+        # user létrehozása, inaktív státusszal
         user = serializer.save()
         user.is_active = False
         user.save()
 
-        # 6 jegyű numerikus kód
+        # 6 jegyű kód
         code = get_random_string(length=6, allowed_chars="0123456789")
 
-        # EmailVerification rekord
         EmailVerification.objects.create(
             user=user,
             code=code,
             is_verified=False,
         )
 
-        # Email kiküldése – ha gond van, csak logoljuk, de NE legyen 500
-        try:
-            send_mail(
-                subject="VAG Fórum – regisztráció megerősítése",
-                message=f"A regisztrációs kódod: {code}",
-                from_email=None,              # DEFAULT_FROM_EMAIL-ből jön a settingsben
-                recipient_list=[user.email],
-                fail_silently=False,          # itt már nem kell True, mert try/except-ben vagyunk
-            )
-        except Exception:
-            logger.exception("Hiba történt a regisztrációs email küldésekor.")
+        # ---------- EMAIL KÜLDÉS RESENDDEL ----------
+        api_key = getattr(settings, "RESEND_API_KEY", "") or os.environ.get("RESEND_API_KEY", "")
+
+        if api_key:
+            try:
+                resend.api_key = api_key
+
+                resend.Emails.send({
+                    "from": "VAG Fórum <[email protected]>",  # ide olyan címet írj, amit Resendben jóváhagytál
+                    "to": [user.email],
+                    "subject": "VAG Fórum – regisztráció megerősítése",
+                    "html": f"""
+                        <p>Szia {user.username}!</p>
+                        <p>A regisztrációs kódod: <strong>{code}</strong></p>
+                        <p>Ha nem te regisztráltál, nyugodtan hagyd figyelmen kívül ezt az üzenetet.</p>
+                    """,
+                })
+            except Exception as e:
+                # Itt logolhatod, ha akarod – a felhasználónak nem dobunk 500-at emiatt
+                print("Resend email hiba:", e)
+        else:
+            print("RESEND_API_KEY nincs beállítva – nem küldtem emailt.")
 
         return Response(
             {"message": "Regisztráció sikeres, ellenőrizd az emailedet a kód miatt."},
