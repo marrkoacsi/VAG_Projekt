@@ -1,7 +1,4 @@
-# accounts/views.py
-from rest_framework.views import APIView
-from rest_framework.response import Response
-from rest_framework import status
+
 from rest_framework.permissions import AllowAny
 from django.contrib.auth import authenticate
 from rest_framework.authtoken.models import Token
@@ -9,28 +6,27 @@ from rest_framework.authtoken.models import Token
 from .serializers import RegisterSerializer, LoginSerializer, EmailVerifySerializer
 from .models import EmailVerification
 
+from rest_framework.views import APIView
+from rest_framework.response import Response
+from rest_framework import status, permissions
 
 class RegisterView(APIView):
-    permission_classes = [AllowAny]
+    permission_classes = [permissions.AllowAny]
 
     def post(self, request):
-        # >>> ITT A LÉNYEG: request.data, NEM request.POST <<<
+        # JSON, form-data, bármi -> request.data
         serializer = RegisterSerializer(data=request.data)
 
-        if not serializer.is_valid():
-            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        if serializer.is_valid():
+            user = serializer.save()
+            # itt mehet a hitelesítő kód generálás + email küldés
+            return Response(
+                {"message": "Regisztráció sikeres, ellenőrizd az emailedet a kód miatt."},
+                status=status.HTTP_201_CREATED,
+            )
 
-        user = serializer.save()
-
-        # verifikációs token létrehozása (ahogy eddig is csináltad)
-        verification = EmailVerification.objects.create(user=user)
-        # itt küldöd ki emailben a verification.token-t
-        verification.send_verification_email()
-
-        return Response(
-            {"message": "Sikeres regisztráció, ellenőrizd az emailedet a kód miatt."},
-            status=status.HTTP_201_CREATED,
-        )
+        # ha valami nem oké, hibaüzeneteket ad vissza (pl. foglalt felhasználónév)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
 class LoginView(APIView):
