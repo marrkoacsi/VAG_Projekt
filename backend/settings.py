@@ -152,6 +152,7 @@ CSRF_TRUSTED_ORIGINS = [
     "https://vag-frontend.onrender.com",
 ]
 
+CORS_ALLOW_CREDENTIALS = True
 
 REST_FRAMEWORK = {
     "DEFAULT_AUTHENTICATION_CLASSES": [
