@@ -143,32 +143,37 @@ DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 # CORS / CSRF – React frontend + Render backend
 # ======================================================================
 
-# FRONTEND Render URL-je:
-# ha nálad más, ezt írd át pl. "https://frontend-igcv.onrender.com"
-FRONTEND_ORIGIN = os.environ.get(
-    "FRONTEND_ORIGIN",
-    "https://vag-frontend.onrender.com"
-)
+INSTALLED_APPS = [
+    # ...
+    "rest_framework",
+    "rest_framework.authtoken",
+    "corsheaders",
+    # ...
+]
 
-# BACKEND Render URL-je:
-BACKEND_ORIGIN = os.environ.get(
-    "BACKEND_ORIGIN",
-    "https://vag-projekt.onrender.com"
-)
+MIDDLEWARE = [
+    "corsheaders.middleware.CorsMiddleware",  # *** EZ LEGYEN LEGELŐL ***
+    "django.middleware.security.SecurityMiddleware",
+    "django.contrib.sessions.middleware.SessionMiddleware",
+    "django.middleware.common.CommonMiddleware",
+    "django.middleware.csrf.CsrfViewMiddleware",
+    "django.contrib.auth.middleware.AuthenticationMiddleware",
+    "django.contrib.messages.middleware.MessageMiddleware",
+    "django.middleware.clickjacking.XFrameOptionsMiddleware",
+]
 
 CORS_ALLOWED_ORIGINS = [
-    "http://localhost:5173",   # helyi Vite fejlesztő szerver
-    FRONTEND_ORIGIN,          # Renderes frontend
+    "http://localhost:5173",
+    "https://frontend-igcv.onrender.com",  # Render frontend URL – pontosan így, perjel nélkül
 ]
 
 CSRF_TRUSTED_ORIGINS = [
     "http://localhost:5173",
-    BACKEND_ORIGIN,           # saját backend Renderen
-    FRONTEND_ORIGIN,          # frontend domain is legyen trusted
+    "https://vag-projekt.onrender.com",
+    "https://frontend-igcv.onrender.com",
 ]
 
 CORS_ALLOW_CREDENTIALS = True
-
 
 # ======================================================================
 # Django REST Framework
