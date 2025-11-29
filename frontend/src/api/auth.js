@@ -1,6 +1,5 @@
 // API_BASE: csak domain, /api NÉLKÜL
-const API_BASE =
-  import.meta.env.VITE_API_BASE_URL || "http://127.0.0.1:8000";
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
 
 async function handleResponse(res) {
   if (!res.ok) {
@@ -17,12 +16,18 @@ async function handleResponse(res) {
 
 // REGISZTRÁCIÓ
 export async function register(payload) {
-  const res = await fetch(`${API_BASE}/api/auth/register/`, {
+  const res = await fetch(`${API_BASE_URL}/auth/register/`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify(payload),
   });
-  return handleResponse(res);
+
+  if (!res.ok) {
+    const data = await res.json().catch(() => null);
+    throw { status: res.status, data };
+  }
+
+  return res.json();
 }
 
 // BELÉPÉS
