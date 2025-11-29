@@ -143,13 +143,13 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 CORS_ALLOWED_ORIGINS = [
     "http://localhost:5173",
-    # később: "https://a-te-frontend-urlod.onrender.com",
-]
+    "https://vag-frontend.onrender.com",  # ha ez lesz a frontend URL
+]   
 
 CSRF_TRUSTED_ORIGINS = [
     "http://localhost:5173",
-    # később: "https://a-te-backend-urlod.onrender.com",
-    # később: "https://a-te-frontend-urlod.onrender.com",
+    "https://vag-service.onrender.com",
+    "https://vag-frontend.onrender.com",
 ]
 
 
