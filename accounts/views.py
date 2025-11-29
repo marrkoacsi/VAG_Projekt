@@ -1,4 +1,5 @@
 # accounts/views.py
+import logging
 from django.contrib.auth import authenticate
 from django.contrib.auth.models import User
 from django.core.mail import send_mail
@@ -12,37 +13,46 @@ from rest_framework.authtoken.models import Token
 from .serializers import RegisterSerializer, LoginSerializer, EmailVerifySerializer
 from .models import EmailVerification
 
+logger = logging.getLogger(__name__)
+
 
 class RegisterView(APIView):
     permission_classes = [permissions.AllowAny]
 
     def post(self, request):
-        # *** FONTOS: JSON-hoz mindig request.data !!! ***
+        # JSON-nál mindig request.data
         serializer = RegisterSerializer(data=request.data)
 
         if not serializer.is_valid():
-            # Itt fogod látni, ha valami mező hiányzik / rossz
+            # pl. üres mező, rövid jelszó, foglalt username/email stb.
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
-        # Létrehozzuk a usert (inaktív lesz, amíg nem erősíti meg az emailt)
+        # user létrehozása (kezdetben inaktív)
         user = serializer.save()
         user.is_active = False
         user.save()
 
-        # 6 jegyű kód
+        # 6 jegyű numerikus kód
         code = get_random_string(length=6, allowed_chars="0123456789")
 
-        # EmailVerification objektum (feltételezve, hogy ilyen a modelled)
-        EmailVerification.objects.create(user=user, code=code, is_verified=False)
-
-        # Email kiküldése (Renderen Gmail app-passworddal)
-        send_mail(
-            subject="VAG Fórum – regisztráció megerősítése",
-            message=f"A regisztrációs kódod: {code}",
-            from_email=None,  # DEFAULT_FROM_EMAIL-ből jön
-            recipient_list=[user.email],
-            fail_silently=True,
+        # EmailVerification rekord
+        EmailVerification.objects.create(
+            user=user,
+            code=code,
+            is_verified=False,
         )
+
+        # Email kiküldése – ha gond van, csak logoljuk, de NE legyen 500
+        try:
+            send_mail(
+                subject="VAG Fórum – regisztráció megerősítése",
+                message=f"A regisztrációs kódod: {code}",
+                from_email=None,              # DEFAULT_FROM_EMAIL-ből jön a settingsben
+                recipient_list=[user.email],
+                fail_silently=False,          # itt már nem kell True, mert try/except-ben vagyunk
+            )
+        except Exception:
+            logger.exception("Hiba történt a regisztrációs email küldésekor.")
 
         return Response(
             {"message": "Regisztráció sikeres, ellenőrizd az emailedet a kód miatt."},
