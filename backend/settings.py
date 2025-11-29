@@ -13,6 +13,8 @@ import os
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 
+RESEND_API_KEY = os.environ.get("RESEND_API_KEY", "")
+
 SECRET_KEY = os.environ.get(
     "DJANGO_SECRET_KEY",
     "dev-secret-ne-hagyd-igy-productionben",  # csak lokális fejlesztésre
