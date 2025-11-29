@@ -1,9 +1,8 @@
+# ======================================================================
+# Alap beállítások
+# ======================================================================
 from pathlib import Path
 import os
-
-# ======================================================================
-# Alap dolgok
-# ======================================================================
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 
@@ -21,11 +20,9 @@ ALLOWED_HOSTS = os.environ.get(
 
 
 # ======================================================================
-# Alkalmazások
+# Appok
 # ======================================================================
-
 INSTALLED_APPS = [
-    # Django alap appok
     "django.contrib.admin",
     "django.contrib.auth",
     "django.contrib.contenttypes",
@@ -38,19 +35,17 @@ INSTALLED_APPS = [
     "rest_framework.authtoken",
     "corsheaders",
 
-    # saját appok
+    # saját
     "accounts",
 ]
 
 
 # ======================================================================
-# Middleware
+# Middleware  – CORS LEGFELÜL!
 # ======================================================================
-
 MIDDLEWARE = [
-    "corsheaders.middleware.CorsMiddleware",
+    "corsheaders.middleware.CorsMiddleware",  # EZ LEGYEN AZ ELSŐ
     "django.middleware.security.SecurityMiddleware",
-    "whitenoise.middleware.WhiteNoiseMiddleware",   # <-- EZ ITT
     "django.contrib.sessions.middleware.SessionMiddleware",
     "django.middleware.common.CommonMiddleware",
     "django.middleware.csrf.CsrfViewMiddleware",
@@ -59,36 +54,10 @@ MIDDLEWARE = [
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
 ]
 
-STATIC_URL = "/static/"
-STATIC_ROOT = BASE_DIR / "staticfiles"
-STATICFILES_STORAGE = "whitenoise.storage.CompressedManifestStaticFilesStorage"
-
-
-
-ROOT_URLCONF = "backend.urls"
-
-TEMPLATES = [
-    {
-        "BACKEND": "django.template.backends.django.DjangoTemplates",
-        "DIRS": [],
-        "APP_DIRS": True,
-        "OPTIONS": {
-            "context_processors": [
-                "django.template.context_processors.request",
-                "django.contrib.auth.context_processors.auth",
-                "django.contrib.messages.context_processors.messages",
-            ],
-        },
-    },
-]
-
-WSGI_APPLICATION = "backend.wsgi.application"
-
 
 # ======================================================================
-# Adatbázis
+# Adatbázis (Render PostgreSQL)
 # ======================================================================
-
 DATABASES = {
     "default": {
         "ENGINE": "django.db.backends.postgresql",
@@ -99,6 +68,7 @@ DATABASES = {
         "PORT": os.environ.get("POSTGRES_PORT", "5432"),
     }
 }
+
 
 
 # ======================================================================
