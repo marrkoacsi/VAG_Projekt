@@ -2,7 +2,6 @@ import { useState, useEffect } from "react";
 import { register, login, verifyEmail } from "./api/auth";
 import { computePasswordChecks } from "./utils/passwordUtils";
 import { parseError } from "./utils/errorParser";
-import ForumPreview from "./components/ForumPreview";
 import RegisterForm from "./components/RegisterForm";
 import VerifyForm from "./components/VerifyForm";
 import LoginForm from "./components/LoginForm";
