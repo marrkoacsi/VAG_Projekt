@@ -1,3 +1,5 @@
+/* ===== SZÍN VÁLTOZÓK ===== */
+
 :root {
   --bg: #020617;
   --bg-card: #020617;
@@ -24,15 +26,23 @@
   --success: #16a34a;
 }
 
+/* ===== RESET / ALAP ===== */
+
 *,
 *::before,
 *::after {
   box-sizing: border-box;
 }
 
+html,
 body {
   margin: 0;
-  font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  padding: 0;
+}
+
+body {
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI",
+    sans-serif;
   background: var(--bg);
   color: var(--text);
 }
@@ -41,54 +51,113 @@ button {
   font-family: inherit;
 }
 
-/* ===== LAYOUT ===== */
+/* ===== FŐ LAYOUT ===== */
 
 .app {
   min-height: 100vh;
   background: radial-gradient(circle at top, #111827 0, var(--bg) 45%);
   color: var(--text);
   display: flex;
-  align-items: stretch;
+  flex-direction: column;
 }
 
-.app-inner {
-  width: 100%;
-  margin: 0;
-  padding: 24px;
+/* ===== FEJLÉC / NAV ===== */
+
+.site-header {
   display: flex;
-  gap: 24px;
-}
-
-/* Bal oldal: fixebb szélesség, jobb oldal: rugalmas */
-.left-panel {
-  flex: 0 0 340px;
-  max-width: 380px;
-}
-
-.right-panel {
-  flex: 1;
-  display: block;
-}
-
-/* Fejléc + header gombok */
-
-.app-header {
-  display: flex;
-  justify-content: space-between;
   align-items: center;
-  margin-bottom: 16px;
+  justify-content: space-between;
+  padding: 10px 20px;
+  border-bottom: 1px solid var(--border);
+  background: rgba(15, 23, 42, 0.94);
+  backdrop-filter: blur(14px);
+  position: sticky;
+  top: 0;
+  z-index: 10;
+}
+
+:root[data-theme="light"] .site-header {
+  background: rgba(243, 244, 246, 0.96);
+}
+
+.site-header__left {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.site-header__right {
+  display: flex;
+  align-items: center;
+  gap: 10px;
 }
 
 .logo {
-  font-size: 24px;
-  letter-spacing: 0.05em;
+  font-size: 22px;
+  letter-spacing: 0.06em;
 }
 
-.header-actions {
+.nav {
   display: flex;
-  align-items: center;
   gap: 8px;
 }
+
+/* ===== GOMBOK / LINK GOMBOK ===== */
+
+.link-button {
+  border: none;
+  background: transparent;
+  color: var(--text-muted);
+  font-size: 13px;
+  cursor: pointer;
+  text-decoration: underline;
+  padding: 4px 6px;
+}
+
+.link-button:hover {
+  color: var(--text);
+}
+
+.link-button--active {
+  color: var(--accent);
+  text-decoration: none;
+  font-weight: 600;
+}
+
+.primary-button {
+  border-radius: 10px;
+  border: none;
+  padding: 9px 14px;
+  background: var(--accent);
+  color: #fff;
+  font-weight: 600;
+  cursor: pointer;
+  font-size: 14px;
+}
+
+.primary-button--small {
+  padding: 6px 10px;
+  font-size: 13px;
+}
+
+.primary-button:disabled {
+  opacity: 0.5;
+  cursor: default;
+}
+
+.secondary-button {
+  margin-top: 8px;
+  width: 100%;
+  border-radius: 10px;
+  border: 1px solid var(--border);
+  padding: 7px 0;
+  background: transparent;
+  color: var(--text);
+  font-size: 13px;
+  cursor: pointer;
+}
+
+/* Theme toggle */
 
 .theme-toggle {
   border-radius: 999px;
@@ -100,13 +169,50 @@ button {
   cursor: pointer;
 }
 
-.link-button {
-  border: none;
-  background: transparent;
+:root[data-theme="light"] .theme-toggle {
+  background: #e5e7eb;
+}
+
+/* User badge */
+
+.user-badge {
+  font-size: 12px;
   color: var(--text-muted);
-  font-size: 13px;
-  cursor: pointer;
-  text-decoration: underline;
+}
+
+.user-badge strong {
+  color: var(--text);
+}
+
+/* ===== APP BELSEJE ===== */
+
+.app-inner {
+  flex: 1;
+  width: 100%;
+  margin: 0;
+  padding: 24px;
+  display: flex;
+  gap: 24px;
+}
+
+/* Bal oldal: auth + lábléc, jobb oldal: fórum */
+
+.left-panel {
+  flex: 0 0 340px;
+  max-width: 380px;
+}
+
+.right-panel {
+  flex: 1;
+  display: block;
+}
+
+/* Lábjegyzet */
+
+.footer {
+  margin-top: 10px;
+  font-size: 11px;
+  color: var(--text-muted);
 }
 
 /* ===== AUTH KÁRTYA ===== */
@@ -118,6 +224,8 @@ button {
   box-shadow: 0 18px 45px rgba(0, 0, 0, 0.55);
   border: 1px solid var(--border);
 }
+
+/* ===== ÜZENETEK ===== */
 
 .alert {
   padding: 8px 10px;
@@ -135,6 +243,8 @@ button {
   background: rgba(248, 113, 113, 0.12);
   border: 1px solid rgba(248, 113, 113, 0.3);
 }
+
+/* ===== FORMOK ===== */
 
 .form {
   display: flex;
@@ -166,7 +276,8 @@ label {
 }
 
 input,
-select {
+select,
+textarea {
   border-radius: 8px;
   border: 1px solid var(--border);
   padding: 7px 9px;
@@ -174,45 +285,20 @@ select {
   background: rgba(15, 23, 42, 0.7);
   color: var(--text);
   outline: none;
+  resize: vertical;
 }
 
 :root[data-theme="light"] input,
-:root[data-theme="light"] select {
+:root[data-theme="light"] select,
+:root[data-theme="light"] textarea {
   background: #f9fafb;
 }
 
 input:focus,
-select:focus {
+select:focus,
+textarea:focus {
   border-color: var(--accent);
   box-shadow: 0 0 0 1px var(--accent-soft);
-}
-
-.primary-button {
-  margin-top: 4px;
-  border-radius: 10px;
-  border: none;
-  padding: 9px 0;
-  background: var(--accent);
-  color: #fff;
-  font-weight: 600;
-  cursor: pointer;
-}
-
-.primary-button:disabled {
-  opacity: 0.5;
-  cursor: default;
-}
-
-.secondary-button {
-  margin-top: 8px;
-  width: 100%;
-  border-radius: 10px;
-  border: 1px solid var(--border);
-  padding: 7px 0;
-  background: transparent;
-  color: var(--text);
-  font-size: 13px;
-  cursor: pointer;
 }
 
 .info-text {
@@ -221,7 +307,12 @@ select:focus {
   margin-bottom: 6px;
 }
 
-/* Jelszó ellenőrző lista */
+.form-error {
+  font-size: 11px;
+  color: var(--danger);
+}
+
+/* ===== JELSZÓ CHECKLIST ===== */
 
 .password-list {
   list-style: none;
@@ -245,15 +336,7 @@ select:focus {
   width: 14px;
 }
 
-/* Lábjegyzet */
-
-.footer {
-  margin-top: 10px;
-  font-size: 11px;
-  color: var(--text-muted);
-}
-
-/* ===== FÓRUM PREVIEW ===== */
+/* ===== FÓRUM PREVIEW (jobb oldali "bemutató" kártya) ===== */
 
 .forum-preview {
   background: rgba(15, 23, 42, 0.8);
@@ -261,7 +344,7 @@ select:focus {
   padding: 18px 18px 18px;
   border: 1px solid var(--border);
   box-shadow: 0 18px 40px rgba(0, 0, 0, 0.5);
-  height: 100%;
+  margin-bottom: 20px;
   display: flex;
   flex-direction: column;
 }
@@ -332,6 +415,8 @@ select:focus {
   color: var(--success);
 }
 
+/* Layout a preview kártyán belül */
+
 .forum-layout {
   display: grid;
   grid-template-columns: 0.7fr 1.3fr;
@@ -346,6 +431,16 @@ select:focus {
 }
 
 :root[data-theme="light"] .forum-categories {
+  background: var(--bg-soft);
+}
+
+.forum-topics {
+  border-radius: 14px;
+  background: rgba(15, 23, 42, 0.7);
+  padding: 10px 12px;
+}
+
+:root[data-theme="light"] .forum-topics {
   background: var(--bg-soft);
 }
 
@@ -372,16 +467,6 @@ select:focus {
 .cat-desc {
   font-size: 11px;
   color: var(--text-muted);
-}
-
-.forum-topics {
-  border-radius: 14px;
-  background: rgba(15, 23, 42, 0.7);
-  padding: 10px 12px;
-}
-
-:root[data-theme="light"] .forum-topics {
-  background: var(--bg-soft);
 }
 
 .topic-list {
@@ -433,9 +518,133 @@ select:focus {
   font-weight: 600;
 }
 
-/* ===== RESPONSIVE (mobil / kisebb kijelzők) ===== */
+/* ===== TÉNYLEGES FORUM OLDAL (ForumPage) ===== */
+
+.page {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.page-title {
+  margin: 0 0 6px;
+  font-size: 20px;
+}
+
+.forum-column {
+  background: rgba(15, 23, 42, 0.8);
+  border-radius: 14px;
+  padding: 12px 14px;
+  border: 1px solid var(--border);
+}
+
+:root[data-theme="light"] .forum-column {
+  background: #ffffff;
+}
+
+.forum-column h2 {
+  margin: 0 0 10px;
+  font-size: 16px;
+}
+
+/* Egyszerű listák */
+
+.list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.list--bordered .list-item {
+  border-bottom: 1px solid rgba(148, 163, 184, 0.2);
+}
+
+.list-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 0;
+}
+
+.list-item--active {
+  background: rgba(59, 130, 246, 0.08);
+  border-radius: 8px;
+  padding-inline: 6px;
+}
+
+.list-item-meta {
+  font-size: 11px;
+  color: var(--text-muted);
+}
+
+/* Kártya a topic nézethez */
+
+.card {
+  border-radius: 14px;
+  background: rgba(15, 23, 42, 0.9);
+  border: 1px solid var(--border);
+}
+
+:root[data-theme="light"] .card {
+  background: #ffffff;
+}
+
+.card-body {
+  padding: 10px 12px;
+}
+
+/* Post lista */
+
+.post-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.post-item {
+  padding: 8px 10px;
+  border-radius: 10px;
+  background: rgba(15, 23, 42, 0.7);
+}
+
+:root[data-theme="light"] .post-item {
+  background: #f3f4f6;
+}
+
+.post-meta {
+  display: flex;
+  justify-content: space-between;
+  font-size: 11px;
+  color: var(--text-muted);
+  margin-bottom: 4px;
+}
+
+.post-content {
+  font-size: 14px;
+}
+
+/* Margin helper osztályok */
+
+.mt-md {
+  margin-top: 12px;
+}
+
+.mt-lg {
+  margin-top: 18px;
+}
+
+/* ===== RESPONSIVE ===== */
 
 @media (max-width: 900px) {
+  .site-header {
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+
   .app-inner {
     flex-direction: column;
     padding: 16px;
@@ -453,30 +662,30 @@ select:focus {
   .forum-preview {
     margin-top: 16px;
   }
+
+  .forum-layout {
+    grid-template-columns: 1fr;
+  }
 }
 
-/* ===== AUTH NÉZET (login / regisztráció / verify) – KÖZÉPRE ===== */
+/* ===== AUTH NÉZET (login / reg / verify) ===== */
 
-/* auth nézetben az egész app középre igazítja a tartalmat */
 .app.app--auth {
-  justify-content: center;
-  align-items: center;
+  /* header marad felül, csak a belső tartalom központosabb */
 }
 
-/* auth nézetben az app-inner NE legyen flex layout, csak egy blokk */
 .app--auth .app-inner {
   max-width: 420px;
   width: 100%;
+  margin: 24px auto;
   padding: 24px 16px;
-  display: block; /* felülírja a fenti display:flex-et */
+  display: block; /* felülírja a flex-et */
 }
 
-/* a bal panel töltse ki az app-inner-t */
 .app--auth .left-panel {
   max-width: 100%;
 }
 
-/* auth nézetben teljesen elrejtjük a jobb oldali (fórum) panelt */
 .app--auth .right-panel {
   display: none !important;
 }
