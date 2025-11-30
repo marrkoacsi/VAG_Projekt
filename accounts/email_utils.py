@@ -1,37 +1,44 @@
+# accounts/email_utils.py
+import os
 import requests
-from django.conf import settings
+
+RESEND_API_KEY = os.environ.get("RESEND_API_KEY")
+RESEND_FROM_EMAIL = os.environ.get(
+    "RESEND_FROM_EMAIL",
+    "noreply@vagforum.store",  # ezt állítottuk Render env-ben is
+)
 
 
-def send_verification_email(to_email: str, code: str) -> None:
+def send_verification_email(to_email: str, code: str) -> bool:
     """
-    Verifikációs email küldése Resend API-val.
-    Ha nincs RESEND_API_KEY, csak kiírjuk a kódot logba, hogy ne dőljön össze az app.
+    True, ha sikerült elküldeni az emailt Resend-del, különben False.
+    FEJLESZTÉSNÉL LOGOLUNK, HOGY LÁSSUK A RESEND VÁLASZT.
     """
-    api_key = getattr(settings, "RESEND_API_KEY", "")
-    from_email = getattr(
-        settings,
-        "RESEND_FROM_EMAIL",
-        "VAG Fórum <no-reply@vagforum.store>",
-    )
-
-    # Ha nincs API key, ne dobjunk hibát – csak logoljuk
-    if not api_key:
-        print("FIGYELEM: RESEND_API_KEY nincs beállítva, nem küldünk valódi emailt!")
-        print(f"Verification code for {to_email}: {code}")
-        return
+    if not RESEND_API_KEY:
+        print("[EMAIL] RESEND_API_KEY hiányzik, nem küldök emailt.")
+        return False
 
     url = "https://api.resend.com/emails"
-    headers = {
-        "Authorization": f"Bearer {api_key}",
-        "Content-Type": "application/json",
-    }
+
     payload = {
-        "from": from_email,
+        "from": f"VAG Fórum <{RESEND_FROM_EMAIL}>",
         "to": [to_email],
         "subject": "VAG Fórum – regisztráció megerősítése",
         "text": f"A regisztrációs kódod: {code}",
     }
 
-    # timeout, hogy ne álljon fejre a worker, ha a Resend lassú
-    response = requests.post(url, headers=headers, json=payload, timeout=10)
-    response.raise_for_status()
+    headers = {
+        "Authorization": f"Bearer {RESEND_API_KEY}",
+        "Content-Type": "application/json",
+    }
+
+    try:
+        resp = requests.post(url, json=payload, headers=headers, timeout=10)
+        # IDE ÍRJUK KI A TELJES RESEND VÁLASZT
+        print("[EMAIL] Resend válasz:", resp.status_code, resp.text)
+
+        resp.raise_for_status()
+        return True
+    except Exception as e:
+        print("[EMAIL] Hiba a Resend hívás közben:", e)
+        return False
