@@ -1,4 +1,4 @@
-const BASE_URL = import.meta.env.VITE_API_BASE_URL || "https://<backend-url>/api";
+const BASE_URL = import.meta.env.VITE_API_BASE_URL || "https://vag-projekt.onrender.com";
 
 async function apiRequest(path, options = {}) {
   const res = await fetch(`${BASE_URL}${path}`, {
