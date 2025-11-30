@@ -231,4 +231,53 @@ function ForumPage() {
         <div className="forum-topic-detail mt-lg">
           <h2>{selectedTopic.title}</h2>
 
-          {loadingPosts
+          {loadingPosts && <p>Hozzászólások betöltése...</p>}
+
+          <div className="card">
+            <div className="card-body">
+              {posts.length === 0 && !loadingPosts && (
+                <p>Még nincsenek hozzászólások ebben a témában.</p>
+              )}
+
+              <ul className="post-list">
+                {posts.map((post) => (
+                  <li key={post.id} className="post-item">
+                    <div className="post-meta">
+                      <strong>{post.author_username || "Ismeretlen"}</strong>{" "}
+                      <span>
+                        {new Date(post.created_at).toLocaleString("hu-HU")}
+                      </span>
+                    </div>
+                    <p className="post-content">{post.content}</p>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          </div>
+
+          {/* Új hozzászólás */}
+          <form className="form mt-md" onSubmit={handleCreatePost}>
+            <div className="form-row">
+              <label>Új hozzászólás</label>
+              <textarea
+                rows={3}
+                value={newPostContent}
+                onChange={(e) => setNewPostContent(e.target.value)}
+                placeholder="Írd ide a hozzászólásod..."
+              />
+            </div>
+            <button
+              type="submit"
+              className="primary-button"
+              disabled={!newPostContent.trim()}
+            >
+              Hozzászólás küldése
+            </button>
+          </form>
+        </div>
+      )}
+    </div>
+  );
+}
+
+export default ForumPage;
