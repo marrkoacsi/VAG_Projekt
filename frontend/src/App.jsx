@@ -6,6 +6,7 @@ import ForumPreview from "./components/ForumPreview";
 import RegisterForm from "./components/RegisterForm";
 import VerifyForm from "./components/VerifyForm";
 import LoginForm from "./components/LoginForm";
+import ForumPage from "./components/ForumPage"; // ⬅️ ÚJ IMPORT
 import "./App.css";
 
 function App() {
@@ -16,6 +17,7 @@ function App() {
     username: "",
     email: "",
     password: "",
+    confirmPassword: "", // ⬅️ ÚJ MEZŐ
     gender: "",
     birthDate: "",
   });
@@ -55,9 +57,16 @@ function App() {
     setError("");
     setMessage("");
 
+    // ⬅️ 1: jelszó erősség ellenőrzés
     const isStrong = Object.values(passwordChecks).every(Boolean);
     if (!isStrong) {
       setError("A jelszó nem felel meg minden feltételnek.");
+      return;
+    }
+
+    // ⬅️ 2: két jelszó egyezésének ellenőrzése
+    if (registerForm.password !== registerForm.confirmPassword) {
+      setError("A jelszavak nem egyeznek.");
       return;
     }
 
@@ -132,6 +141,7 @@ function App() {
       username: "",
       email: "",
       password: "",
+      confirmPassword: "", // ⬅️ itt is resetelünk
       gender: "",
       birthDate: "",
     });
@@ -209,21 +219,26 @@ function App() {
 
         <div className="right-panel">
           {view === "home" && (
-            <ForumPreview
-              currentUser={currentUser}
-              isLoggedIn={!!token}
-              onGoToRegister={() => {
-                setMessage("");
-                setError("");
-                setView("register");
-              }}
-              onGoToLogin={() => {
-                setMessage("");
-                setError("");
-                setView("login");
-              }}
-              onLogout={handleLogout}
-            />
+            <>
+              <ForumPreview
+                currentUser={currentUser}
+                isLoggedIn={!!token}
+                onGoToRegister={() => {
+                  setMessage("");
+                  setError("");
+                  setView("register");
+                }}
+                onGoToLogin={() => {
+                  setMessage("");
+                  setError("");
+                  setView("login");
+                }}
+                onLogout={handleLogout}
+              />
+
+              {/* ⬅️ Itt jelenik meg a valódi fórum oldal */}
+              <ForumPage />
+            </>
           )}
         </div>
       </div>
@@ -231,4 +246,4 @@ function App() {
   );
 }
 
-export default App;                 
+export default App;
