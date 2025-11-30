@@ -221,6 +221,7 @@ function App() {
     setTheme((prev) => (prev === "dark" ? "light" : "dark"));
   };
 
+  // ========== REGISZTRÁCIÓ ==========
   const handleRegisterSubmit = async (e) => {
     e.preventDefault();
     setError("");
@@ -247,12 +248,17 @@ function App() {
         data.message ||
           "Regisztráció sikeres, ellenőrizd az emailedet a kód miatt."
       );
+
+      // emailt elmentheted, ha akarod, de state-ben is megmarad:
+      // localStorage.setItem("pending_email", registerForm.email);
+
       setView("verify");
     } catch (err) {
       parseError(err, setError);
     }
   };
 
+  // ========== EMAIL HITELESÍTÉS ==========
   const handleVerifySubmit = async (e) => {
     e.preventDefault();
     setError("");
@@ -260,18 +266,19 @@ function App() {
 
     try {
       const data = await verifyEmail(registerForm.email, verificationCode);
-      const user = { username: data.username, email: data.email };
-      setToken(data.token);
-      setCurrentUser(user);
-      localStorage.setItem("token", data.token);
-      localStorage.setItem("user", JSON.stringify(user));
-      setMessage(data.message || "Email megerősítve, üdv a fórumban!");
-      setView("home");
+
+      setMessage(
+        data.message || "Email sikeresen megerősítve! Most már be tudsz lépni."
+      );
+
+      // ha nem akarsz automatikus login-t, egyszerűen átdobod a login nézetre
+      setView("login");
     } catch (err) {
       parseError(err, setError);
     }
   };
 
+  // ========== BELÉPÉS ==========
   const handleLoginSubmit = async (e) => {
     e.preventDefault();
     setError("");
@@ -279,11 +286,17 @@ function App() {
 
     try {
       const data = await login(loginForm.username, loginForm.password);
-      const user = { username: data.username, email: data.email };
+
+      const user = {
+        username: data.username || loginForm.username,
+        email: data.email || "",
+      };
+
       setToken(data.token);
       setCurrentUser(user);
       localStorage.setItem("token", data.token);
       localStorage.setItem("user", JSON.stringify(user));
+
       setMessage(data.message || "Sikeres belépés.");
       setView("home");
     } catch (err) {
