@@ -25,28 +25,38 @@ class RegisterView(APIView):
         if not serializer.is_valid():
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
-        # user létrehozás inaktívként
+        # user létrehozása, inaktívként
         user = serializer.save()
         user.is_active = False
         user.save()
 
-        # 6 jegyű kód
+        # 6 számjegyű kód
         code = get_random_string(length=6, allowed_chars="0123456789")
 
-        # EmailVerification sor
-        EmailVerification.objects.create(user=user, code=code, is_verified=False)
-
-        # Email küldése Resend API-val
-        try:
-            send_verification_email(user.email, code)
-        except Exception:
-            # Ha itt elszállna bármi, NEM dobunk 500-at a frontend felé
-            logger.exception("Hiba történt a verifikációs email küldése közben.")
-
-        return Response(
-            {"message": "Regisztráció sikeres, ellenőrizd az emailedet a kód miatt."},
-            status=status.HTTP_201_CREATED,
+        EmailVerification.objects.create(
+            user=user,
+            code=code,
+            is_verified=False,
         )
+
+        # Email küldés Resend-del
+        email_ok = send_verification_email(user.email, code)
+
+        # VÁLASZ – ha nem ment ki az email, FEJLESZTÉSNÉL visszaadjuk a kódot is
+        response_data = {
+            "message": "Regisztráció sikeres, ellenőrizd az emailedet a kód miatt.",
+        }
+
+        if not email_ok:
+            # Ezt PROD-ban majd érdemes kiszedni, de most debugra tökéletes
+            response_data["email_info"] = (
+                "Nem sikerült elküldeni a verifikációs emailt. "
+                "Fejlesztés alatt a kódot itt is megkapod."
+            )
+            response_data["debug_code"] = code
+
+        return Response(response_data, status=status.HTTP_201_CREATED)
+
 
 
 class LoginView(APIView):
