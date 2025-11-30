@@ -11,7 +11,7 @@ def send_verification_email(to_email: str, code: str) -> None:
     from_email = getattr(
         settings,
         "RESEND_FROM_EMAIL",
-        "VAG Fórum <onboarding@resend.dev>",
+        "VAG Fórum <no-reply@vagforum.store>",
     )
 
     # Ha nincs API key, ne dobjunk hibát – csak logoljuk
