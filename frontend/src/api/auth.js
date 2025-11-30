@@ -1,20 +1,23 @@
-// src/api/auth.js
+// frontend/src/api/auth.js
 
-// VITE_API_BASE_URL pl.:
-// - lokalban:  http://127.0.0.1:8000/api
-// - renderen:  https://vag-projekt.onrender.com/api
+// VITE_API_BASE_URL:
+//   - local:  http://127.0.0.1:8000
+//   - Render: https://vag-projekt.onrender.com
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
 
 async function handleResponse(res) {
   let data = null;
+
   try {
     data = await res.json();
   } catch (e) {
-    // ha nem JSON, marad null
+    // ha nem JSON a válasz, marad null
   }
 
   if (!res.ok) {
-    throw { status: res.status, data };
+    // a backend által küldött hibaobjektumot dobjuk tovább,
+    // hogy a parseError normálisan tudjon vele dolgozni
+    throw data || { detail: "Ismeretlen hiba történt." };
   }
 
   return data;
@@ -22,7 +25,7 @@ async function handleResponse(res) {
 
 // ============== REGISZTRÁCIÓ ==============
 export async function register(payload) {
-  const res = await fetch(`${API_BASE_URL}/auth/register/`, {
+  const res = await fetch(`${API_BASE_URL}/api/auth/register/`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify(payload),
@@ -32,11 +35,11 @@ export async function register(payload) {
 }
 
 // ============== BELÉPÉS ==============
-export async function login(payload) {
-  const res = await fetch(`${API_BASE_URL}/auth/login/`, {
+export async function login(username, password) {
+  const res = await fetch(`${API_BASE_URL}/api/auth/login/`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify(payload),
+    body: JSON.stringify({ username, password }),
   });
 
   return handleResponse(res);
@@ -44,7 +47,7 @@ export async function login(payload) {
 
 // ============== EMAIL HITELESÍTÉS ==============
 export async function verifyEmail(email, code) {
-  const res = await fetch(`${API_BASE_URL}/auth/verify-email/`, {
+  const res = await fetch(`${API_BASE_URL}/api/auth/verify-email/`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ email, code }),
