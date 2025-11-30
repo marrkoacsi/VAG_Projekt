@@ -150,7 +150,7 @@ CSRF_TRUSTED_ORIGINS = [
     "http://localhost:5173",
     "https://vag-projekt.onrender.com",
     "https://frontend-igcv.onrender.com",
-    "vagforum.store",
+    "https://vagforum.store",
 ]
 
 CORS_ALLOW_CREDENTIALS = True
