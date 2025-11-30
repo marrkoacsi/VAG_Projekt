@@ -275,26 +275,6 @@ function App() {
         </div>
 
         <div className="right-panel">
-          {view === "home" && (
-            <>
-              <ForumPreview
-                currentUser={currentUser}
-                isLoggedIn={!!token}
-                onGoToRegister={() => {
-                  setMessage("");
-                  setError("");
-                  setView("register");
-                }}
-                onGoToLogin={() => {
-                  setMessage("");
-                  setError("");
-                  setView("login");
-                }}
-                onLogout={handleLogout}
-              />
-              <ForumPage />
-            </>
-          )}
         </div>
       </div>
     </div>
