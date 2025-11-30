@@ -17,6 +17,7 @@ DEBUG = os.environ.get("DJANGO_DEBUG", "True") == "True"
 ALLOWED_HOSTS = os.environ.get(
     "DJANGO_ALLOWED_HOSTS",
     "localhost,127.0.0.1"
+    "vagforum.store",
 ).split(",")
 
 
@@ -142,12 +143,14 @@ DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 CORS_ALLOWED_ORIGINS = [
     "http://localhost:5173",
     "https://frontend-igcv.onrender.com",
+    "https://vagforum.store",
 ]
 
 CSRF_TRUSTED_ORIGINS = [
     "http://localhost:5173",
     "https://vag-projekt.onrender.com",
     "https://frontend-igcv.onrender.com",
+    "vagforum.store",
 ]
 
 CORS_ALLOW_CREDENTIALS = True
