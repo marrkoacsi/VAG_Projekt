@@ -1,0 +1,393 @@
+<!DOCTYPE html>
+<html lang="hu">
+  <head>
+    <meta charset="UTF-8" />
+    <title>VAG Fórum – Regisztráció / Belépés</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <link rel="stylesheet" href="App.css" />
+  </head>
+  <body>
+    <div class="app app--auth">
+      <div class="app-inner">
+        <div class="left-panel">
+          <header class="app-header">
+            <h1 class="logo">VAG Fórum</h1>
+            <div class="header-actions">
+              <a href="index.html" class="link-button">Főoldal</a>
+              <button
+                type="button"
+                class="theme-toggle"
+                id="theme-toggle"
+              >
+                🌙 Sötét mód
+              </button>
+            </div>
+          </header>
+
+          <div class="auth-card">
+            <div id="message" class="alert alert--success" style="display:none"></div>
+            <div id="error" class="alert alert--error" style="display:none"></div>
+
+            <!-- REGISZTRÁCIÓS ŰRLAP -->
+            <form id="register-form" class="form">
+              <div class="form-row">
+                <label for="reg-username">Felhasználónév</label>
+                <input id="reg-username" type="text" required />
+              </div>
+
+              <div class="form-row">
+                <label for="reg-email">Email</label>
+                <input id="reg-email" type="email" required />
+              </div>
+
+              <div class="form-row">
+                <label for="reg-password">Jelszó</label>
+                <input id="reg-password" type="password" required />
+                <ul class="password-list" id="password-checklist">
+                  <li class="password-list__item" data-check="length">
+                    <span class="password-list__bullet">•</span>
+                    Legalább 8 karakter
+                  </li>
+                  <li class="password-list__item" data-check="upper">
+                    <span class="password-list__bullet">•</span>
+                    Tartalmaz nagybetűt
+                  </li>
+                  <li class="password-list__item" data-check="digit">
+                    <span class="password-list__bullet">•</span>
+                    Tartalmaz számot
+                  </li>
+                  <li class="password-list__item" data-check="special">
+                    <span class="password-list__bullet">•</span>
+                    Tartalmaz speciális karaktert
+                  </li>
+                </ul>
+              </div>
+
+              <div class="form-row form-row--split">
+                <div>
+                  <label for="reg-gender">Nem</label>
+                  <select id="reg-gender">
+                    <option value="">Válassz…</option>
+                    <option value="male">Férfi</option>
+                    <option value="female">Nő</option>
+                    <option value="other">Egyéb / Nem szeretném megadni</option>
+                  </select>
+                </div>
+                <div>
+                  <label for="reg-birthdate">Születési idő</label>
+                  <input id="reg-birthdate" type="date" />
+                </div>
+              </div>
+
+              <button
+                id="register-submit"
+                type="submit"
+                class="primary-button"
+                disabled
+              >
+                Regisztráció
+              </button>
+            </form>
+
+            <!-- EMAIL HITELESÍTÉS -->
+            <form id="verify-form" class="form" style="display:none">
+              <p class="info-text">
+                Megerősítő kódot küldtünk a(z)
+                <strong id="verify-email-label">…</strong>
+                címre.
+              </p>
+              <div class="form-row">
+                <label for="verify-code">Ellenőrző kód</label>
+                <input id="verify-code" type="text" required />
+              </div>
+              <button type="submit" class="primary-button">
+                Email hitelesítése
+              </button>
+            </form>
+
+            <!-- BELÉPÉS -->
+            <form id="login-form" class="form" style="display:none">
+              <div class="form-row">
+                <label for="login-username">Felhasználónév</label>
+                <input id="login-username" type="text" required />
+              </div>
+              <div class="form-row">
+                <label for="login-password">Jelszó</label>
+                <input id="login-password" type="password" required />
+              </div>
+              <button type="submit" class="primary-button">
+                Belépés
+              </button>
+            </form>
+          </div>
+
+          <p class="footer">
+            © <span id="current-year"></span> VAG Fórum – saját projekt
+          </p>
+        </div>
+      </div>
+    </div>
+
+    <script>
+      // ===== BEÁLLÍTÁS: API BASE URL A JELENLEGI DJANGO BACKENDHEZ =====
+      // Állítsd be ugyanarra, amit VITE_API_BASE_URL-ként használsz:
+      const API_BASE_URL = "https://vag-projekt.onrender.com";
+
+      // ===== TÉMA KEZELÉSE =====
+      (function () {
+        const root = document.documentElement;
+        const storedTheme = localStorage.getItem("theme") || "dark";
+        root.setAttribute("data-theme", storedTheme);
+        const btn = document.getElementById("theme-toggle");
+        function updateLabel() {
+          const t = root.getAttribute("data-theme");
+          btn.textContent = t === "dark" ? "☀ Világos mód" : "🌙 Sötét mód";
+        }
+        updateLabel();
+        btn.addEventListener("click", function () {
+          const current = root.getAttribute("data-theme") || "dark";
+          const next = current === "dark" ? "light" : "dark";
+          root.setAttribute("data-theme", next);
+          localStorage.setItem("theme", next);
+          updateLabel();
+        });
+      })();
+
+      // ===== LÁBJEGYZET ÉV =====
+      document.getElementById("current-year").textContent =
+        new Date().getFullYear();
+
+      // ===== SEGÉDFÜGGVÉNYEK (a React-es kód átemelve) =====
+      function computePasswordChecks(password) {
+        return {
+          length: password.length >= 8,
+          upper: /[A-Z]/.test(password),
+          digit: /[0-9]/.test(password),
+          special: /[!@#$%^&*()_\-+=\[{\]}\\|;:'",.<>/?]/.test(password),
+        };
+      }
+
+      function updatePasswordChecklist(password) {
+        const checks = computePasswordChecks(password);
+        const items = document.querySelectorAll("#password-checklist li");
+        let allOk = true;
+        items.forEach((li) => {
+          const key = li.dataset.check;
+          const ok = checks[key];
+          const bullet = li.querySelector(".password-list__bullet");
+          if (ok) {
+            li.classList.add("ok");
+            bullet.textContent = "✔";
+          } else {
+            li.classList.remove("ok");
+            bullet.textContent = "•";
+            allOk = false;
+          }
+        });
+        document.getElementById("register-submit").disabled = !allOk;
+      }
+
+      function setMessage(text) {
+        const box = document.getElementById("message");
+        if (!text) {
+          box.style.display = "none";
+          box.textContent = "";
+        } else {
+          box.style.display = "block";
+          box.textContent = text;
+        }
+      }
+
+      function setError(text) {
+        const box = document.getElementById("error");
+        if (!text) {
+          box.style.display = "none";
+          box.textContent = "";
+        } else {
+          box.style.display = "block";
+          box.textContent = text;
+        }
+      }
+
+      function parseError(err) {
+        if (!err) return "Ismeretlen hiba történt.";
+        if (typeof err === "string") return err;
+        if (err.detail) return err.detail;
+        const parts = [];
+        for (const key in err) {
+          if (Array.isArray(err[key])) {
+            parts.push(key + ": " + err[key].join(", "));
+          }
+        }
+        return parts.join(" | ") || "Ismeretlen hiba történt.";
+      }
+
+      async function handleResponse(res) {
+        let data = null;
+        try {
+          data = await res.json();
+        } catch (e) {}
+        if (!res.ok) {
+          throw data || { detail: "Ismeretlen hiba történt." };
+        }
+        return data;
+      }
+
+      async function registerRequest(payload) {
+        const res = await fetch(API_BASE_URL + "/api/auth/register/", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(payload),
+        });
+        return handleResponse(res);
+      }
+
+      async function verifyEmailRequest(email, code) {
+        const res = await fetch(API_BASE_URL + "/api/auth/verify-email/", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ email, code }),
+        });
+        return handleResponse(res);
+      }
+
+      async function loginRequest(username, password) {
+        const res = await fetch(API_BASE_URL + "/api/auth/login/", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ username, password }),
+        });
+        return handleResponse(res);
+      }
+
+      // ===== NÉZETVÁLTÁS (regisztráció / verify / login) =====
+      function setView(view) {
+        document.getElementById("register-form").style.display =
+          view === "register" ? "block" : "none";
+        document.getElementById("verify-form").style.display =
+          view === "verify" ? "block" : "none";
+        document.getElementById("login-form").style.display =
+          view === "login" ? "block" : "none";
+      }
+
+      // URL paraméter alapján kezdeti nézet (?view=login / ?view=register)
+      (function () {
+        const params = new URLSearchParams(window.location.search);
+        const viewParam = params.get("view");
+        if (viewParam === "login") {
+          setView("login");
+        } else {
+          setView("register");
+        }
+      })();
+
+      // ===== ESEMÉNYKEZELŐK =====
+      document
+        .getElementById("reg-password")
+        .addEventListener("input", function (e) {
+          updatePasswordChecklist(e.target.value);
+        });
+
+      document
+        .getElementById("register-form")
+        .addEventListener("submit", async function (e) {
+          e.preventDefault();
+          setMessage("");
+          setError("");
+
+          const username = document
+            .getElementById("reg-username")
+            .value.trim();
+          const email = document.getElementById("reg-email").value.trim();
+          const password = document
+            .getElementById("reg-password")
+            .value.trim();
+          const gender = document.getElementById("reg-gender").value;
+          const birthDate = document.getElementById("reg-birthdate").value;
+
+          const checks = computePasswordChecks(password);
+          if (!Object.values(checks).every(Boolean)) {
+            setError("A jelszó nem felel meg minden feltételnek.");
+            return;
+          }
+
+          const payload = {
+            username: username,
+            email: email,
+            password: password,
+            gender: gender,
+            birth_date: birthDate || null,
+          };
+
+          try {
+            const data = await registerRequest(payload);
+            setMessage(
+              data.message ||
+                "Regisztráció sikeres, ellenőrizd az emailedet a kód miatt."
+            );
+            document.getElementById("verify-email-label").textContent = email;
+            setView("verify");
+          } catch (err) {
+            setError(parseError(err));
+          }
+        });
+
+      document
+        .getElementById("verify-form")
+        .addEventListener("submit", async function (e) {
+        e.preventDefault();
+        setMessage("");
+        setError("");
+
+        const email = document
+          .getElementById("verify-email-label")
+          .textContent.trim();
+        const code = document.getElementById("verify-code").value.trim();
+
+        try {
+          const data = await verifyEmailRequest(email, code);
+          setMessage(
+            (data && data.message) ||
+              "Email sikeresen megerősítve! Most már be tudsz lépni."
+          );
+          setView("login");
+        } catch (err) {
+          setError(parseError(err));
+        }
+      });
+
+      document
+        .getElementById("login-form")
+        .addEventListener("submit", async function (e) {
+          e.preventDefault();
+          setMessage("");
+          setError("");
+
+          const username = document
+            .getElementById("login-username")
+            .value.trim();
+          const password = document
+            .getElementById("login-password")
+            .value.trim();
+
+          try {
+            const data = await loginRequest(username, password);
+
+            const user = {
+              username: username,
+              email: "",
+            };
+
+            localStorage.setItem("token", data.token);
+            localStorage.setItem("user", JSON.stringify(user));
+
+            setMessage("Sikeres belépés.");
+            // Vissza a főoldalra
+            window.location.href = "index.html";
+          } catch (err) {
+            setError(parseError(err));
+          }
+        });
+    </script>
+  </body>
+</html>
