@@ -1,5 +1,221 @@
-<body>
-  <div id="root"></div>
-  <script type="module" src="/src/main.jsx"></script>
-</body>
+<!DOCTYPE html>
+<html lang="hu">
+  <head>
+    <meta charset="UTF-8" />
+    <title>VAG Fórum – Főoldal</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <!-- Másold ide a Reactes App.css-t, és nevezd App.css-nek,
+         vagy állítsd be a helyes elérési utat -->
+    <link rel="stylesheet" href="App.css" />
+  </head>
+  <body>
+    <div class="app">
+      <div class="app-inner">
+        <div class="left-panel">
+          <header class="app-header">
+            <h1 class="logo">VAG Fórum</h1>
+            <div class="header-actions">
+              <button
+                type="button"
+                class="theme-toggle"
+                id="theme-toggle"
+              >
+                🌙 Sötét mód
+              </button>
+            </div>
+          </header>
 
+          <p class="footer">
+            © <span id="current-year"></span> VAG Fórum – saját projekt
+          </p>
+        </div>
+
+        <div class="right-panel">
+          <div class="forum-preview">
+            <div class="forum-header">
+              <div>
+                <h2>VAG Fórum – főoldal</h2>
+                <p>VW, Audi, Škoda, SEAT – hibák, tuning, tapasztalatok.</p>
+              </div>
+              <div class="forum-userbox" id="forum-userbox">
+                <!-- JS tölti ki a bejelentkezett / vendég állapotot -->
+              </div>
+            </div>
+
+            <div class="forum-layout">
+              <aside class="forum-categories">
+                <h3>Kategóriák</h3>
+                <ul>
+                  <li>
+                    <div class="cat-title">Volkswagen</div>
+                    <div class="cat-desc">Golf, Passat, Polo, TDI, stb.</div>
+                  </li>
+                  <li>
+                    <div class="cat-title">Audi</div>
+                    <div class="cat-desc">
+                      A3, A4, A6, quattro, S/RS modellek.
+                    </div>
+                  </li>
+                  <li>
+                    <div class="cat-title">Škoda</div>
+                    <div class="cat-desc">
+                      Fabia, Octavia, Superb, tuning.
+                    </div>
+                  </li>
+                  <li>
+                    <div class="cat-title">SEAT</div>
+                    <div class="cat-desc">Ibiza, Leon, Cupra.</div>
+                  </li>
+                </ul>
+              </aside>
+
+              <main class="forum-topics">
+                <h3>Legutóbbi témák</h3>
+                <div class="topic-list">
+                  <div class="topic-row">
+                    <div class="topic-main">
+                      <div class="topic-title">
+                        Golf 4 TDI hidegindítási problémák
+                      </div>
+                      <div class="topic-meta">
+                        Volkswagen • Utolsó válasz: tdiBence – 2025-11-26
+                      </div>
+                    </div>
+                    <div class="topic-stats">
+                      <div>
+                        <span class="topic-stat-label">Válaszok</span>
+                        <span class="topic-stat-value">12</span>
+                      </div>
+                      <div>
+                        <span class="topic-stat-label">Megtekintés</span>
+                        <span class="topic-stat-value">540</span>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div class="topic-row">
+                    <div class="topic-main">
+                      <div class="topic-title">
+                        Fabia 1.4 16V BBZ – ajánlott olaj, gyertyák
+                      </div>
+                      <div class="topic-meta">
+                        Škoda • Utolsó válasz: fabiaRallye – 2025-11-25
+                      </div>
+                    </div>
+                    <div class="topic-stats">
+                      <div>
+                        <span class="topic-stat-label">Válaszok</span>
+                        <span class="topic-stat-value">7</span>
+                      </div>
+                      <div>
+                        <span class="topic-stat-label">Megtekintés</span>
+                        <span class="topic-stat-value">210</span>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div class="topic-row">
+                    <div class="topic-main">
+                      <div class="topic-title">
+                        A6 C5 2.5 TDI – tipikus hibák vásárlás előtt
+                      </div>
+                      <div class="topic-meta">
+                        Audi • Utolsó válasz: tdsGeri – 2025-11-24
+                      </div>
+                    </div>
+                    <div class="topic-stats">
+                      <div>
+                        <span class="topic-stat-label">Válaszok</span>
+                        <span class="topic-stat-value">19</span>
+                      </div>
+                      <div>
+                        <span class="topic-stat-label">Megtekintés</span>
+                        <span class="topic-stat-value">890</span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </main>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <script>
+      // ===== Téma (sötét/világos) kezelése =====
+      (function() {
+        const root = document.documentElement;
+        const storedTheme = localStorage.getItem("theme") || "dark";
+        root.setAttribute("data-theme", storedTheme);
+        const btn = document.getElementById("theme-toggle");
+        function updateLabel() {
+          const t = root.getAttribute("data-theme");
+          btn.textContent = t === "dark" ? "☀ Világos mód" : "🌙 Sötét mód";
+        }
+        updateLabel();
+        btn.addEventListener("click", function () {
+          const current = root.getAttribute("data-theme") || "dark";
+          const next = current === "dark" ? "light" : "dark";
+          root.setAttribute("data-theme", next);
+          localStorage.setItem("theme", next);
+          updateLabel();
+        });
+      })();
+
+      // ===== Lábjegyzet év =====
+      document.getElementById("current-year").textContent =
+        new Date().getFullYear();
+
+      // ===== Bejelentkezett állapot megjelenítése =====
+      (function () {
+        const forumUserbox = document.getElementById("forum-userbox");
+        const token = localStorage.getItem("token");
+        let user = null;
+        try {
+          const raw = localStorage.getItem("user");
+          if (raw) user = JSON.parse(raw);
+        } catch (e) {
+          user = null;
+        }
+
+        if (token && user) {
+          forumUserbox.innerHTML = `
+            <span class="badge badge--success">Bejelentkezve</span>
+            <div class="forum-userbox__name">
+              ${user.username}
+              <span>${user.email || ""}</span>
+            </div>
+            <div class="forum-userbox__actions">
+              <button id="logout-button">Kijelentkezés</button>
+            </div>
+          `;
+          const logoutBtn = document.getElementById("logout-button");
+          logoutBtn.addEventListener("click", function () {
+            localStorage.removeItem("token");
+            localStorage.removeItem("user");
+            location.reload();
+          });
+        } else {
+          forumUserbox.innerHTML = `
+            <span class="badge">Nem vagy bejelentkezve</span>
+            <div class="forum-userbox__actions">
+              <button id="go-login">Belépés</button>
+              <button id="go-register">Regisztráció</button>
+            </div>
+          `;
+          document
+            .getElementById("go-login")
+            .addEventListener("click", function () {
+              window.location.href = "reglog.html?view=login";
+            });
+          document
+            .getElementById("go-register")
+            .addEventListener("click", function () {
+              window.location.href = "reglog.html?view=register";
+            });
+        }
+      })();
+    </script>
+  </body>
+</html>
