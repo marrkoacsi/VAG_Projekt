@@ -6,7 +6,7 @@ import ForumPreview from "./components/ForumPreview";
 import RegisterForm from "./components/RegisterForm";
 import VerifyForm from "./components/VerifyForm";
 import LoginForm from "./components/LoginForm";
-import ForumPage from "./components/ForumPage"; // ⬅️ ÚJ IMPORT
+import ForumPage from "./components/ForumPage";
 import "./App.css";
 
 function App() {
@@ -17,7 +17,7 @@ function App() {
     username: "",
     email: "",
     password: "",
-    confirmPassword: "", // ⬅️ ÚJ MEZŐ
+    confirmPassword: "",
     gender: "",
     birthDate: "",
   });
@@ -57,14 +57,12 @@ function App() {
     setError("");
     setMessage("");
 
-    // ⬅️ 1: jelszó erősség ellenőrzés
     const isStrong = Object.values(passwordChecks).every(Boolean);
     if (!isStrong) {
       setError("A jelszó nem felel meg minden feltételnek.");
       return;
     }
 
-    // ⬅️ 2: két jelszó egyezésének ellenőrzése
     if (registerForm.password !== registerForm.confirmPassword) {
       setError("A jelszavak nem egyeznek.");
       return;
@@ -141,7 +139,7 @@ function App() {
       username: "",
       email: "",
       password: "",
-      confirmPassword: "", // ⬅️ itt is resetelünk
+      confirmPassword: "",
       gender: "",
       birthDate: "",
     });
@@ -156,26 +154,86 @@ function App() {
 
   return (
     <div className={`app ${view !== "home" ? "app--auth" : ""}`}>
+      {/* FEJLÉC / NAV */}
+      <header className="site-header">
+        <div className="site-header__left">
+          <h1 className="logo">VAG Fórum</h1>
+          <nav className="nav">
+            <button
+              type="button"
+              className="link-button"
+              onClick={() => {
+                setMessage("");
+                setError("");
+                setView("home");
+              }}
+            >
+              Főoldal
+            </button>
+            <button
+              type="button"
+              className="link-button"
+              onClick={() => {
+                setMessage("");
+                setError("");
+                setView("home"); // a fórum jelenleg a főoldal jobb oldalán van
+              }}
+            >
+              Fórum
+            </button>
+          </nav>
+        </div>
+
+        <div className="site-header__right">
+          {currentUser ? (
+            <>
+              <span className="user-badge">
+                Bejelentkezve: <strong>{currentUser.username}</strong>
+              </span>
+              <button
+                type="button"
+                className="link-button"
+                onClick={handleLogout}
+              >
+                Kijelentkezés
+              </button>
+            </>
+          ) : (
+            <>
+              <button
+                type="button"
+                className="link-button"
+                onClick={() => {
+                  setMessage("");
+                  setError("");
+                  setView("login");
+                }}
+              >
+                Belépés
+              </button>
+              <button
+                type="button"
+                className="primary-button primary-button--small"
+                onClick={() => {
+                  setMessage("");
+                  setError("");
+                  setView("register");
+                }}
+              >
+                Regisztráció
+              </button>
+            </>
+          )}
+
+          <button className="theme-toggle" onClick={handleThemeToggle}>
+            {theme === "dark" ? "☀ Világos mód" : "🌙 Sötét mód"}
+          </button>
+        </div>
+      </header>
+
+      {/* FŐ TARTALOM */}
       <div className="app-inner">
         <div className="left-panel">
-          <header className="app-header">
-            <h1 className="logo">VAG Fórum</h1>
-            <div className="header-actions">
-              {view !== "home" && (
-                <button
-                  type="button"
-                  className="link-button"
-                  onClick={() => setView("home")}
-                >
-                  Főoldal
-                </button>
-              )}
-              <button className="theme-toggle" onClick={handleThemeToggle}>
-                {theme === "dark" ? "☀ Világos mód" : "🌙 Sötét mód"}
-              </button>
-            </div>
-          </header>
-
           {view !== "home" && (
             <div className="auth-card">
               {view === "register" && (
@@ -235,8 +293,6 @@ function App() {
                 }}
                 onLogout={handleLogout}
               />
-
-              {/* ⬅️ Itt jelenik meg a valódi fórum oldal */}
               <ForumPage />
             </>
           )}
