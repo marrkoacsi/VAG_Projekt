@@ -2,7 +2,7 @@ from django.contrib import admin
 from django.urls import path, include
 
 from accounts.views import RegisterView, LoginView, VerifyEmailView
-
+//SZIAAA
 from rest_framework.routers import DefaultRouter
 from forum.views import CategoryViewSet, TopicViewSet, PostViewSet
 
