@@ -104,36 +104,37 @@ function App() {
   };
 
   const handleLoginSubmit = async (e) => {
-    e.preventDefault();
-    setError("");
-    setMessage("");
+  e.preventDefault();
+  setError("");
+  setMessage("");
 
-    try {
-      const data = await login(loginForm.username, loginForm.password);
+  try {
+    const data = await login(loginForm.email, loginForm.password);
 
-      const user = {
-        username: data.username || loginForm.username,
-        email: data.email || "",
-      };
+    const user = {
+      username: data.username || "",
+      email: data.email || loginForm.email,
+    };
 
-      setToken(data.token);
-      setCurrentUser(user);
-      localStorage.setItem("token", data.token);
-      localStorage.setItem("user", JSON.stringify(user));
+    setToken(data.token);
+    setCurrentUser(user);
+    localStorage.setItem("token", data.token);
+    localStorage.setItem("user", JSON.stringify(user));
 
-      setMessage(data.message || "Sikeres belépés.");
-      setView("home");
-    } catch (err) {
-      parseError(err, setError);
-    }
-  };
+    setMessage(data.message || "Sikeres belépés.");
+    setView("home");
+  } catch (err) {
+    parseError(err, setError);
+  }
+};
+
 
   const handleLogout = () => {
     setToken(null);
     setCurrentUser(null);
     localStorage.removeItem("token");
     localStorage.removeItem("user");
-    setLoginForm({ username: "", password: "" });
+    setLoginForm({ email: "", password: "" });
     setRegisterForm({
       username: "",
       email: "",
