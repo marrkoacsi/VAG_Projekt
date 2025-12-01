@@ -6,19 +6,20 @@ function LoginForm({ loginForm, setLoginForm, onSubmit, message, error }) {
 
       <form className="form" onSubmit={onSubmit}>
         <div className="form-row">
-          <label>Felhasználónév</label>
-          <input
-            type="text"
-            value={loginForm.username}
-            onChange={(e) =>
-              setLoginForm((prev) => ({
-                ...prev,
-                username: e.target.value,
-              }))
-            }
-            required
-          />
-        </div>
+  <label>Email cím</label>
+  <input
+    type="email"
+    value={loginForm.email}
+    onChange={(e) =>
+      setLoginForm((prev) => ({
+        ...prev,
+        email: e.target.value,
+      }))
+    }
+    required
+  />
+</div>
+
         <div className="form-row">
           <label>Jelszó</label>
           <input
