@@ -67,14 +67,25 @@ class LoginView(APIView):
         if not serializer.is_valid():
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
-        user = authenticate(
-            username=serializer.validated_data["username"],
-            password=serializer.validated_data["password"],
-        )
+        email = serializer.validated_data["email"]
+        password = serializer.validated_data["password"]
+
+        # felhasználó keresése email alapján
+        try:
+            user_obj = User.objects.get(email=email)
+        except User.DoesNotExist:
+            return Response(
+                {"detail": "Hibás email vagy jelszó."},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+
+        # Django továbbra is username + password alapján authentikál,
+        # ezért a megtalált user felhasználónevét adjuk át
+        user = authenticate(username=user_obj.username, password=password)
 
         if user is None:
             return Response(
-                {"detail": "Hibás felhasználónév vagy jelszó."},
+                {"detail": "Hibás email vagy jelszó."},
                 status=status.HTTP_400_BAD_REQUEST,
             )
 
@@ -85,7 +96,15 @@ class LoginView(APIView):
             )
 
         token, _ = Token.objects.get_or_create(user=user)
-        return Response({"token": token.key})
+
+        return Response(
+            {
+                "token": token.key,
+                "username": user.username,
+                "email": user.email,
+                "message": "Sikeres belépés.",
+            }
+        )
 
 
 class VerifyEmailView(APIView):
