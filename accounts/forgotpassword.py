@@ -1,7 +1,7 @@
-import secrets
-import requests
-from accounts.models import UserResetToken
-from datetime import datetime,timedelta
-from rest_framework import serializers,views
+import secrets """token generálás"""
+import requests """API behívás HTTP kéréssel"""
+from accounts.models import UserResetToken """adatbazis modell beimportalasa"""
+from datetime import datetime,timedelta """ídőkezeles"""
+from rest_framework import serializers,views """API endpointok és serializer-ek használata"""
 
 
