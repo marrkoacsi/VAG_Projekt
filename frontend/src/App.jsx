@@ -21,7 +21,7 @@ function App() {
     birthDate: "",
   });
 
-  const [loginForm, setLoginForm] = useState({ username: "", password: "" });
+  const [loginForm, setLoginForm] = useState({ email: "", password: "" });
   const [verificationCode, setVerificationCode] = useState("");
   const [passwordChecks, setPasswordChecks] = useState(
     computePasswordChecks("")
