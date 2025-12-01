@@ -49,3 +49,10 @@ class LoginSerializer(serializers.Serializer):
 class EmailVerifySerializer(serializers.Serializer):
     email = serializers.EmailField()
     code = serializers.CharField(max_length=6)
+
+"""
+Email bekérés forgotpasswordhez
+"""
+
+class EmailRequest(serializers.Serializer):
+    email = serializers.EmailField()
