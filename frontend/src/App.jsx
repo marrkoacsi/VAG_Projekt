@@ -13,6 +13,14 @@ function App() {
   const [view, setView] = useState("home");
 
   const [registerForm, setRegisterForm] = useState({
+    ű
+
+
+
+
+      jhadsfDFKBJFÉÁVDLŰGÚL
+  ÉJRZÚŐ
+  TQW4PUQKJÁÉBYDŰÁÉG
     username: "",
     email: "",
     password: "",
