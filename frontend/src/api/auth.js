@@ -35,15 +35,16 @@ export async function register(payload) {
 }
 
 // ============== BELÉPÉS ==============
-export async function login(username, password) {
+export async function login(email, password) {
   const res = await fetch(`${API_BASE_URL}/api/auth/login/`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ username, password }),
+    body: JSON.stringify({ email, password }),
   });
 
   return handleResponse(res);
 }
+
 
 // ============== EMAIL HITELESÍTÉS ==============
 export async function verifyEmail(email, code) {
