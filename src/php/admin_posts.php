@@ -15,7 +15,7 @@
                 date, 
                 likes, 
                 file_name 
-            FROM posts 
+            FROM forum
             ORDER BY id DESC
         ");
 
