@@ -5,23 +5,35 @@
     require "db_connect.php";
     require "cors.php";
 
-    $data = json_decode(file_get_contents("php://input"), true);
+    // A nyers bemenet beolvasása
+    $json = file_get_contents("php://input");
+    $data = json_decode($json, true);
 
-    $id = $data["id"] ?? 0;
+    $id = $data["id"];
 
-    if(!$id) {
-        echo json_encode(["success"=>false, "message"=>"Nincs ID megadva"]);
-        exit;
-    }
+    try {
+        // Ellenőrizzük, létezik-e a felhasználó a törlés előtt
+        $check = $db->prepare("SELECT id FROM users WHERE id = :id");
+        $check->execute([":id" => $id]);
+        
+        if ($check->rowCount() === 0) {
+            echo json_encode(["success" => false, "message" => "A felhasználó nem található"]);
+            exit;
+        }
 
-    if($id){
-
+        // Tényleges törlés
         $stmt = $db->prepare("DELETE FROM users WHERE id = :id");
-        $stmt->execute([":id"=>$id]);
+        $result = $stmt->execute([":id" => $id]);
 
-        echo json_encode(["success"=>true]);
-    } else {
-        echo json_encode(["success"=>false, "message"=>"Hiba történt"]);
+        if ($result) {
+            echo json_encode(["success" => true, "message" => "Felhasználó sikeresen törölve"]);
+        } else {
+            echo json_encode(["success" => false, "message" => "Adatbázis hiba történt a törlés során"]);
+        }
+
+    } catch (PDOException $e) {
+        // SQL hiba (pl. idegen kulcs korlátozás)
+        echo json_encode(["success" => false, "message" => "SQL Hiba: " . $e->getMessage()]);
     }
 
 ?>
