@@ -1,0 +1,227 @@
+.premium-container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 40px 20px;
+  font-family: inherit;
+  color: var(--text);
+}
+
+.premium-header {
+  text-align: center;
+  margin-bottom: 50px;
+}
+
+.premium-header h1 {
+  font-size: 2.5rem;
+  margin-bottom: 10px;
+}
+
+.premium-header p {
+  color: var(--muted);
+  font-size: 1.1rem;
+}
+
+.pricing-grid {
+  display: flex;
+  justify-content: center;
+  gap: 30px;
+  flex-wrap: wrap;
+}
+
+.pricing-card {
+  background: var(--card-bg);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 30px;
+  width: 300px;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.pricing-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 10px 25px rgba(0,0,0,0.05);
+}
+
+
+.pricing-card.popular {
+  border: 2px solid #ef4444; /* Piros keret */
+  box-shadow: 0 10px 30px rgba(239, 68, 68, 0.1);
+}
+
+
+.popular-badge {
+  position: absolute;
+  top: -12px;
+  right: 20px;
+  background-color: #ef4444;
+  color: white;
+  font-size: 0.8rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  padding: 6px 16px;
+  border-radius: 20px;
+  box-shadow: 0 4px 6px rgba(239, 68, 68, 0.3);
+  letter-spacing: 0.5px;
+}
+
+.pricing-card h3 {
+  font-size: 1.5rem;
+  margin: 0 0 15px;
+}
+
+.price {
+  font-size: 2rem;
+  font-weight: 700;
+  margin-bottom: 25px;
+  color: var(--text);
+}
+
+.price span {
+  font-size: 1rem;
+  color: var(--muted);
+  font-weight: 400;
+}
+
+.features {
+  list-style: none;
+  padding: 0;
+  margin: 0 0 30px;
+  flex-grow: 1;
+}
+
+.features li {
+  margin-bottom: 12px;
+  color: var(--muted);
+  display: flex;
+  align-items: center;
+}
+
+.features li::before {
+  content: "✓";
+  color: #16a34a;
+  margin-right: 10px;
+  font-weight: bold;
+}
+
+.btn-plan {
+  width: 100%;
+  padding: 12px;
+  border-radius: 8px;
+  border: 1px solid var(--border);
+  background: var(--card-bg);
+  color: var(--text);
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.btn-plan:hover {
+  background-color: var(--surface);
+}
+
+.btn-plan:disabled {
+  background-color: #e5e7eb;
+  color: #9ca3af;
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+
+[data-theme="dark"] .btn-plan:disabled {
+  background-color: #374151;
+  color: #6b7280;
+}
+
+.btn-plan.primary {
+  background-color: #ef4444;
+  color: white;
+  border-color: #ef4444;
+}
+
+.btn-plan.primary:hover {
+  background-color: #dc2626;
+}
+
+/* Success message styles */
+.success-message {
+  background: #10b981;
+  color: white;
+  padding: 15px 20px;
+  border-radius: 8px;
+  margin-bottom: 30px;
+  text-align: center;
+  animation: slideDown 0.3s ease;
+  font-weight: 500;
+}
+
+/* Premium status banner */
+.premium-status-banner {
+  background: linear-gradient(135deg, #3b82f6 0%, #8b5cf6 100%);
+  color: white;
+  padding: 15px 20px;
+  border-radius: 8px;
+  margin-bottom: 30px;
+  text-align: center;
+  font-weight: 500;
+}
+
+[data-theme="dark"] .premium-status-banner {
+  background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%);
+}
+
+@keyframes slideDown {
+  from {
+    opacity: 0;
+    transform: translateY(-20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@media (max-width: 768px) {
+  .premium-container {
+    padding: 20px 10px;
+  }
+
+  .premium-header h1 {
+    font-size: 2rem;
+  }
+
+  .pricing-grid {
+    gap: 20px;
+  }
+
+  .pricing-card {
+    width: 250px;
+    padding: 20px;
+  }
+}
+
+@media (max-width: 480px) {
+  .premium-container {
+    padding: 15px 5px;
+  }
+
+  .premium-header h1 {
+    font-size: 1.8rem;
+  }
+
+  .pricing-card {
+    width: 100%;
+    max-width: 300px;
+    padding: 15px;
+  }
+
+  .price {
+    font-size: 1.5rem;
+  }
+
+  .popular-badge {
+    font-size: 0.7rem;
+    padding: 4px 12px;
+  }
+}

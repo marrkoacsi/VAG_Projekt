@@ -1,0 +1,107 @@
+.forum-layout {
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  gap: 30px;
+  width: 100%;
+  max-width: 1600px;
+  margin: 0 auto;
+  padding: 20px 10px;
+}
+
+.forum-main {
+  flex: 1;
+  width: 100%; /* Hogy ne maradjon üres hely mellette */
+  max-width: 1240px; /* Asztalin szélesebb posztkártyák */
+  margin: 0 auto;
+}
+
+.ad-sidebar {
+  width: 160px; 
+  flex-shrink: 0;
+  display: none; 
+}
+
+.ad-container {
+  position: sticky;
+  top: 100px; 
+  width: 100%;
+  height: 600px;
+  background-color: #f0f0f0;
+  border: 1px dashed #ccc;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #888;
+  font-weight: bold;
+  border-radius: 8px;
+}
+
+[data-theme="dark"] .ad-container {
+  background-color: #1a1a2e;
+  border-color: var(--border);
+  color: var(--muted);
+}
+
+
+.advertisement {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: 10px;
+}
+
+.advertisement-image {
+  width: 100%;
+  height: auto;
+  max-height: 500px;
+  object-fit: contain;
+  border-radius: 8px;
+  margin-bottom: 10px;
+}
+
+.advertisement-contact {
+  font-size: 12px;
+  color: #666;
+}
+
+.advertisement-contact p {
+  margin: 0 0 5px 0;
+  font-weight: bold;
+}
+
+.advertisement-email {
+  color: #0066cc;
+  text-decoration: none;
+  font-weight: normal;
+}
+
+.advertisement-email:hover {
+  text-decoration: underline;
+}
+
+[data-theme="dark"] .advertisement-contact {
+  color: #ccc;
+}
+
+[data-theme="dark"] .advertisement-email {
+  color: #66aaff;
+}
+
+.forum-layout.premium {
+  justify-content: center;
+}
+
+.forum-layout.premium .forum-main {
+  max-width: 100%;
+}
+
+@media (min-width: 1200px) {
+  .ad-sidebar {
+    display: block;
+  }
+}
