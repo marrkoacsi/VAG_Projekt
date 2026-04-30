@@ -9,9 +9,19 @@
 
     $id = $data["id"] ?? 0;
 
-    $stmt = $db->prepare("DELETE FROM users WHERE id = :id");
-    $stmt->execute([":id"=>$id]);
+    if(!$id) {
+        echo json_encode(["success"=>false, "message"=>"Nincs ID megadva"]);
+        exit;
+    }
 
-    echo json_encode(["success"=>true]);
+    if($id){
+
+        $stmt = $db->prepare("DELETE FROM users WHERE id = :id");
+        $stmt->execute([":id"=>$id]);
+
+        echo json_encode(["success"=>true]);
+    } else {
+        echo json_encode(["success"=>false, "message"=>"Hiba történt"]);
+    }
 
 ?>

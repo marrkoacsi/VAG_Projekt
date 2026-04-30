@@ -10,7 +10,7 @@
 
     if (isset($data->id)) {
         try {
-            $stmt = $db->prepare("DELETE FROM posts WHERE id = ?");
+            $stmt = $db->prepare("DELETE FROM forum WHERE id = ?");
             $success = $stmt->execute([$data->id]);
 
             if ($success) {
