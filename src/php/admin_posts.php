@@ -1,18 +1,34 @@
 <?php
-    header("Content-Type: application/json; charset=UTF-8");
-    require "db_connect.php"; // Feltételezve, hogy ez a fájl tartalmazza a PDO kapcsolatot
+    header('Content-Type: application/json');
+
+    require "db_connect.php";
+    require "cors.php";
 
     try {
-        // Lekérdezzük a posztokat. A képeid alapján ezek a mezők léteznek.
-        $query = "SELECT id, brand_id, problem_id, post_id, user_id, name, content, view_count, date, likes, dislikes, reply_count, file_name FROM posts ORDER BY date DESC";
-        $stmt = $conn->prepare($query);
-        $stmt->execute();
+        // Lekérjük a legfontosabb mezőket a posztok táblából
+        $stmt = $db->query("
+            SELECT 
+                id, 
+                user_id, 
+                name, 
+                content, 
+                date, 
+                likes, 
+                file_name 
+            FROM posts 
+            ORDER BY id DESC
+        ");
 
         $posts = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
-        echo json_encode(["posts" => $posts]);
+        echo json_encode([
+            "success" => true,
+            "posts" => $posts
+        ]);
     } catch (Exception $e) {
-        http_response_code(500);
-        echo json_encode(["error" => $e->getMessage()]);
+        echo json_encode([
+            "success" => false,
+            "message" => $e->getMessage()
+        ]);
     }
 ?>

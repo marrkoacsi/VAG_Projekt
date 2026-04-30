@@ -1,26 +1,39 @@
 <?php
-    header("Content-Type: application/json; charset=UTF-8");
+    header('Content-Type: application/json');
 
     require "db_connect.php";
+    require "cors.php";
 
-    $data = json_decode(file_get_contents("php://input"));
+    // Beolvassuk a JSON kérést
+    $json = file_get_contents('php://input');
+    $data = json_decode($json);
 
-    if (!empty($data->id)) {
+    if (isset($data->id)) {
         try {
-            $query = "DELETE FROM posts WHERE id = ?";
-            $stmt = $conn->prepare($query);
-            
-            if ($stmt->execute([$data->id])) {
-                echo json_encode(["message" => "Post deleted successfully"]);
+            $stmt = $db->prepare("DELETE FROM posts WHERE id = ?");
+            $success = $stmt->execute([$data->id]);
+
+            if ($success) {
+                echo json_encode([
+                    "success" => true,
+                    "message" => "Post törölve"
+                ]);
             } else {
-                echo json_encode(["message" => "Unable to delete post"]);
+                echo json_encode([
+                    "success" => false,
+                    "message" => "Törlési hiba"
+                ]);
             }
         } catch (Exception $e) {
-            http_response_code(500);
-            echo json_encode(["error" => $e->getMessage()]);
+            echo json_encode([
+                "success" => false,
+                "message" => $e->getMessage()
+            ]);
         }
     } else {
-        http_response_code(400);
-        echo json_encode(["message" => "Incomplete data. Post ID is required."]);
+        echo json_encode([
+            "success" => false,
+            "message" => "Nincs ID megadva"
+        ]);
     }
 ?>
